@@ -1,0 +1,113 @@
+/* Disable All Animations and Enable Smooth Scrolling */
+
+/* Enable smooth scrolling */
+html {
+  scroll-behavior: smooth !important;
+}
+
+/* Disable all animations */
+* {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Disable keyframe animations */
+@keyframes caret-blink {
+  0%, 70%, to { opacity: 1; }
+  20%, 50% { opacity: 1; }
+}
+
+@keyframes pulse {
+  50% { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(0deg); }
+}
+
+@keyframes enter {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(0);
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(0);
+  }
+}
+
+@keyframes accordion-up {
+  0% { height: auto; }
+  to { height: 0; }
+}
+
+@keyframes accordion-down {
+  0% { height: 0; }
+  to { height: auto; }
+}
+
+/* Remove animation classes */
+.animate-caret-blink,
+.animate-pulse,
+.animate-spin {
+  animation: none !important;
+}
+
+/* Disable transitions on all elements */
+button,
+a,
+input,
+select,
+textarea,
+[role="button"] {
+  transition: none !important;
+}
+
+/* Disable hover effects that might use transitions */
+*:hover {
+  transition: none !important;
+}
+
+/* Disable focus transitions */
+*:focus,
+*:focus-visible {
+  transition: none !important;
+}
+
+/* Ensure GSAP animations are disabled if present */
+[data-gsap-animation],
+[data-animation] {
+  animation: none !important;
+}
+
+/* Disable scroll-triggered animations */
+.scroll-animate,
+[data-scroll-animate] {
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+/* Ensure all motion is disabled */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Force smooth scroll behavior for all browsers */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  scroll-behavior: smooth;
+}

@@ -1,0 +1,284 @@
+/* Spacing Fixes - Reduce gaps and create smooth scrolling experience */
+
+/* Remove excessive section padding and margins */
+section,
+.section,
+[class*="section"],
+[class*="Section"],
+.container,
+[class*="container"] {
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Reduce hero section height */
+.hero,
+[class*="hero"],
+[class*="Hero"],
+.banner,
+[class*="banner"],
+header[class*="hero"],
+header[class*="Hero"] {
+  min-height: 50vh !important;
+  max-height: 70vh !important;
+  padding-top: 3rem !important;
+  padding-bottom: 2rem !important;
+}
+
+/* Tighten main content areas */
+main,
+.main,
+[role="main"],
+.content,
+[class*="content"] {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+/* Reduce heading margins */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Reduce paragraph spacing */
+p {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+  line-height: 1.6;
+}
+
+/* Tighten list spacing */
+ul, ol, li {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+/* Remove excessive spacing from divs */
+div {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Reduce gap in flex containers */
+.flex, [display="flex"] {
+  gap: 0.5rem !important;
+}
+
+/* Reduce grid gaps */
+.grid, [display="grid"] {
+  gap: 1rem !important;
+}
+
+/* Tighten spacing for common layout classes */
+.py-0, .py-1, .py-2 {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
+.my-0, .my-1, .my-2 {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Remove large padding from containers */
+.px-4, .px-6, .px-8 {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* Reduce spacing in cards and boxes */
+.card,
+[class*="card"],
+.box,
+[class*="box"],
+.panel,
+[class*="panel"] {
+  padding: 1rem !important;
+  margin: 0 !important;
+}
+
+/* Tighten spacing in navigation */
+nav,
+[role="navigation"],
+.nav,
+[class*="nav"] {
+  padding: 0.5rem 0 !important;
+  margin: 0 !important;
+}
+
+/* Remove excessive spacing from footer */
+footer,
+[role="contentinfo"],
+.footer,
+[class*="footer"] {
+  padding-top: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
+  margin-top: 0 !important;
+}
+
+/* Reduce spacing in lists */
+li {
+  margin-bottom: 0.25rem !important;
+}
+
+/* Tighten button spacing */
+button,
+.button,
+[role="button"],
+a[class*="button"] {
+  margin: 0.25rem !important;
+  padding: 0.5rem 1rem !important;
+}
+
+/* Remove excessive line heights */
+body {
+  line-height: 1.5;
+}
+
+/* Reduce spacing in form elements */
+input,
+textarea,
+select,
+form {
+  margin-bottom: 0.5rem !important;
+}
+
+/* Tighten spacing in tables */
+table,
+tr,
+td,
+th {
+  margin: 0 !important;
+  padding: 0.25rem !important;
+}
+
+/* Remove excessive spacing from images */
+img,
+picture,
+video {
+  margin: 0 !important;
+  display: block;
+}
+
+/* Reduce spacing in blockquotes */
+blockquote {
+  margin: 0.5rem 0 !important;
+  padding-left: 1rem !important;
+}
+
+/* Tighten spacing in code blocks */
+code,
+pre {
+  margin: 0 !important;
+  padding: 0.25rem !important;
+}
+
+/* Remove excessive spacing from hr */
+hr {
+  margin: 0.5rem 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure smooth scroll without gaps */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 0;
+}
+
+body {
+  scroll-behavior: smooth;
+}
+
+/* Remove padding from page wrapper */
+#page,
+.site,
+[class*="wrapper"],
+[class*="container-main"] {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Ensure sections flow seamlessly */
+section + section,
+.section + .section,
+div[class*="section"] + div[class*="section"] {
+  margin-top: 0 !important;
+}
+
+/* Reduce spacing in nested elements */
+section > div,
+.section > div,
+main > div,
+.content > div {
+  margin: 0 !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+/* Tighten spacing in text containers */
+.text-container,
+[class*="text-content"],
+.prose,
+[class*="prose"] {
+  padding: 1rem !important;
+  margin: 0 !important;
+}
+
+/* Remove excessive spacing from headers */
+header,
+[role="banner"],
+.header,
+[class*="header"] {
+  padding: 0.75rem 0 !important;
+  margin: 0 !important;
+}
+
+/* Reduce spacing in sidebars */
+aside,
+[role="complementary"],
+.sidebar,
+[class*="sidebar"] {
+  padding: 1rem !important;
+  margin: 0 !important;
+}
+
+/* Ensure consistent spacing across breakpoints */
+@media (max-width: 768px) {
+  section,
+  .section,
+  [class*="section"] {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+  
+  .px-4, .px-6, .px-8 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+}
+
+/* Prevent layout shifts */
+* {
+  box-sizing: border-box;
+}
+
+/* Smooth transitions between sections */
+section,
+.section {
+  position: relative;
+  z-index: 1;
+}
+
+/* Remove gaps in full-width sections */
+[class*="full-width"],
+[class*="fullwidth"],
+.w-full {
+  width: 100%;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
