@@ -13,18 +13,24 @@ function cozanet_aegis_setup() {
     add_theme_support('post-thumbnails');
     add_theme_support('html5', ['search-form', 'comment-form', 'comment-list', 'gallery', 'caption']);
     add_theme_support('custom-logo');
+    add_theme_support('customize-selective-refresh-widgets');
 }
 add_action('after_setup_theme', 'cozanet_aegis_setup');
 
 function cozanet_aegis_scripts() {
+    // Styles
     wp_enqueue_style('cozanet-aegis-style', get_stylesheet_uri(), [], COZANET_AEGIS_VERSION);
     wp_enqueue_style('cozanet-aegis-main', COZANET_AEGIS_URI . '/assets/css/main.css', [], COZANET_AEGIS_VERSION);
+    // Scripts
+    wp_enqueue_script('cozanet-aegis-main', COZANET_AEGIS_URI . '/assets/js/main.js', [], COZANET_AEGIS_VERSION, true);
 }
 add_action('wp_enqueue_scripts', 'cozanet_aegis_scripts');
 
-// Remove WP version for security
+// Security
 remove_action('wp_head', 'wp_generator');
 add_filter('the_generator', '__return_empty_string');
+remove_action('wp_head', 'wlwmanifest_link');
+remove_action('wp_head', 'rsd_link');
 
-// Allow full HTML in pages (for our custom content)
+// Remove WP auto-paragraph formatting (we handle our own HTML)
 remove_filter('the_content', 'wpautop');
