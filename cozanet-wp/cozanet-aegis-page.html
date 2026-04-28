@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cozanet — Aegis Wallet Funding</title>
+<style>
+:root {
+  --bg: #070708;
+  --panel: #0d0d10;
+  --panel2: #111116;
+  --border: #1e1e28;
+  --border2: #252530;
+  --gold: #c9a84c;
+  --gold-soft: #e2c97e;
+  --gold-dim: #5a4820;
+  --text: #e8e8f0;
+  --muted: #7a7a90;
+  --muted2: #5a5a70;
+  --green: #22c55e;
+  --orange: #f59e0b;
+  --red: #ef4444;
+  --blue: #6366f1;
+  --sidebar-w: 220px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;font-family:inherit;}
+select{font-family:inherit;}
+
+/* ═══════════════════════════════
+   TOP BAR
+═══════════════════════════════ */
+#topbar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:var(--bg);border-bottom:1px solid var(--border);
+  height:56px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+}
+.topbar-logo{display:flex;align-items:center;gap:10px;}
+.topbar-logo img{height:32px;width:32px;object-fit:contain;}
+.topbar-logo-text{display:flex;flex-direction:column;line-height:1.1;}
+.topbar-logo-text span:first-child{font-weight:700;font-size:15px;color:var(--text);}
+.topbar-logo-text span:last-child{font-size:10px;color:var(--gold);letter-spacing:2px;font-weight:700;}
+.topbar-nav{display:flex;align-items:center;gap:24px;}
+.topbar-nav a{font-size:13px;color:var(--muted);transition:color 0.2s;}
+.topbar-nav a:hover,.topbar-nav a.active{color:var(--text);}
+.topbar-nav a.active{color:var(--gold);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.topbar-icon{background:none;border:none;color:var(--muted);font-size:18px;padding:6px;border-radius:6px;transition:color 0.2s;}
+.topbar-icon:hover{color:var(--text);}
+.topbar-wallet{
+  display:flex;align-items:center;gap:8px;
+  background:var(--panel2);border:1px solid var(--border2);
+  border-radius:8px;padding:6px 12px;font-size:13px;color:var(--text);
+  cursor:pointer;transition:border-color 0.2s;
+}
+.topbar-wallet:hover{border-color:var(--gold-dim);}
+.wallet-dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
+
+/* ═══════════════════════════════
+   LAYOUT
+═══════════════════════════════ */
+#layout{display:flex;padding-top:56px;min-height:100vh;}
+
+/* ═══════════════════════════════
+   SIDEBAR
+═══════════════════════════════ */
+#sidebar{
+  width:var(--sidebar-w);min-width:var(--sidebar-w);
+  background:var(--panel);border-right:1px solid var(--border);
+  position:fixed;top:56px;left:0;bottom:0;
+  display:flex;flex-direction:column;overflow-y:auto;
+  padding:16px 0;
+}
+.sidebar-section{padding:8px 16px 4px;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;}
+.sidebar-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 16px;font-size:13px;color:var(--muted);
+  cursor:pointer;transition:all 0.15s;border-left:2px solid transparent;
+  margin:1px 0;
+}
+.sidebar-item:hover{color:var(--text);background:rgba(255,255,255,0.03);}
+.sidebar-item.active{color:var(--gold);background:rgba(201,168,76,0.06);border-left-color:var(--gold);}
+.sidebar-item .icon{font-size:16px;width:20px;text-align:center;}
+.sidebar-badge{
+  margin-left:auto;font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:20px;
+}
+.badge-new{background:rgba(99,102,241,0.2);color:#818cf8;}
+.badge-beta{background:rgba(201,168,76,0.15);color:var(--gold);}
+.sidebar-footer{margin-top:auto;padding:16px;}
+.community-card{
+  background:rgba(201,168,76,0.06);border:1px solid var(--gold-dim);
+  border-radius:10px;padding:16px;text-align:center;
+}
+.community-card p{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px;}
+.btn-join{
+  display:block;width:100%;padding:9px;border-radius:6px;
+  background:linear-gradient(135deg,var(--gold),#a07828);
+  color:#000;font-weight:700;font-size:12px;border:none;
+}
+.avatars{display:flex;justify-content:center;gap:-6px;margin-top:10px;}
+.avatar-stack{display:flex;justify-content:center;}
+.avatar-stack img{width:24px;height:24px;border-radius:50%;border:2px solid var(--panel);margin-left:-6px;}
+.sidebar-secure{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;margin:0 8px;
+  background:rgba(255,255,255,0.02);border:1px solid var(--border);
+  border-radius:8px;font-size:11px;
+}
+.sidebar-secure .shield{color:var(--gold);font-size:16px;}
+.sidebar-secure span{color:var(--muted);line-height:1.3;}
+.sidebar-secure strong{color:var(--text);display:block;}
+
+/* ═══════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════ */
+#main{
+  margin-left:var(--sidebar-w);
+  flex:1;padding:28px;
+  display:flex;flex-direction:column;gap:20px;
+}
+
+/* ═══════════════════════════════
+   PAGE HEADER
+═══════════════════════════════ */
+.page-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.page-title-block h1{font-size:28px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px;}
+.page-title-block h1 .shield-icon{color:var(--gold);font-size:26px;}
+.page-title-block p{font-size:14px;color:var(--muted);margin-top:4px;}
+.how-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:9px 18px;border:1px solid var(--border2);
+  border-radius:20px;background:var(--panel2);
+  font-size:13px;color:var(--muted);transition:all 0.2s;
+}
+.how-btn:hover{border-color:var(--gold-dim);color:var(--gold);}
+.how-btn .play{
+  width:20px;height:20px;border-radius:50%;
+  background:var(--gold);color:#000;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;
+}
+
+/* ═══════════════════════════════
+   CONTENT GRID (3 cols)
+═══════════════════════════════ */
+.content-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
+
+/* ═══════════════════════════════
+   WIDGET: FIND BEST ROUTE
+═══════════════════════════════ */
+.widget-card{
+  background:var(--panel2);border:1px solid var(--border);
+  border-radius:14px;padding:24px;
+}
+.widget-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:20px;}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-group label{font-size:11px;color:var(--muted);margin-bottom:6px;display:block;letter-spacing:0.5px;}
+.input-wrap{
+  display:flex;align-items:center;gap:0;
+  background:var(--bg);border:1px solid var(--border2);border-radius:8px;overflow:hidden;
+  transition:border-color 0.2s;
+}
+.input-wrap:focus-within{border-color:var(--gold-dim);}
+.input-wrap input{
+  flex:1;background:none;border:none;outline:none;
+  padding:10px 12px;font-size:14px;color:var(--text);font-family:inherit;
+}
+.input-wrap .currency-select{
+  display:flex;align-items:center;gap:4px;
+  padding:8px 10px;border-left:1px solid var(--border2);
+  background:rgba(255,255,255,0.03);
+}
+.currency-select select{
+  background:none;border:none;outline:none;color:var(--text);
+  font-size:13px;font-weight:600;cursor:pointer;
+}
+.currency-select .flag{font-size:16px;}
+.full-input{
+  background:var(--bg);border:1px solid var(--border2);border-radius:8px;
+  padding:10px 14px;display:flex;align-items:center;gap:10px;
+  transition:border-color 0.2s;
+}
+.full-input:focus-within{border-color:var(--gold-dim);}
+.full-input input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:inherit;}
+.full-input .valid-tag{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--green);white-space:nowrap;}
+.full-input .icon-btn{background:none;border:none;color:var(--muted);font-size:15px;padding:2px;}
+.select-wrap select{
+  width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:8px;
+  padding:10px 12px;color:var(--text);font-size:14px;font-family:inherit;outline:none;
+  transition:border-color 0.2s;cursor:pointer;
+}
+.select-wrap select:focus{border-color:var(--gold-dim);}
+
+.find-btn{
+  width:100%;padding:14px;border:none;border-radius:10px;
+  background:linear-gradient(135deg,var(--gold) 0%,#a07828 100%);
+  color:#000;font-weight:700;font-size:15px;letter-spacing:0.3px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:4px;transition:opacity 0.2s,transform 0.15s;
+}
+.find-btn:hover{opacity:0.9;transform:translateY(-1px);}
+
+/* ═══════════════════════════════
+   BEST ROUTE SECTION
+═══════════════════════════════ */
+.routes-section{margin-top:20px;}
+.routes-header{font-size:16px;font-weight:600;color:var(--text);margin-bottom:14px;}
+
+.recommended-route{
+  background:rgba(201,168,76,0.06);border:1px solid var(--gold-dim);
+  border-radius:12px;padding:18px 20px;margin-bottom:14px;
+  position:relative;overflow:hidden;
+}
+.recommended-route::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.rec-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--gold);border:1px solid var(--gold-dim);border-radius:20px;
+  padding:3px 10px;margin-bottom:14px;
+}
+.rec-badge::before{content:'●';font-size:8px;color:var(--gold);}
+.route-row{display:flex;align-items:center;gap:16px;}
+.route-logo{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,#1a1a2e,#16213e);
+  border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:900;color:#fff;flex-shrink:0;
+}
+.route-logo.quidax{background:linear-gradient(135deg,#1a2a4a,#0f1e35);}
+.route-logo.binance{background:linear-gradient(135deg,#1a1400,#2a2000);}
+.route-logo.yellowcard{background:linear-gradient(135deg,#1a1200,#2a1e00);}
+.route-logo.paxful{background:linear-gradient(135deg,#0a1a2a,#071525);}
+.route-info{flex:1;}
+.route-name{font-weight:700;font-size:15px;color:var(--text);}
+.route-type{font-size:12px;color:var(--muted);margin-top:1px;}
+.route-savings{font-size:12px;color:var(--green);font-weight:600;margin-top:4px;}
+.route-metrics{display:flex;gap:28px;margin-left:auto;align-items:center;}
+.metric{text-align:right;}
+.metric-label{font-size:10px;color:var(--muted);letter-spacing:0.5px;margin-bottom:3px;}
+.metric-value{font-size:15px;font-weight:700;color:var(--text);}
+.metric-sub{font-size:11px;color:var(--muted);}
+.metric-sub.green{color:var(--green);}
+.risk-dot{display:inline-block;width:8px;height:8px;border-radius:50%;}
+.risk-low{background:var(--green);}
+.risk-medium{background:var(--orange);}
+.risk-high{background:var(--red);}
+.route-chevron{color:var(--muted);font-size:18px;padding:0 4px;}
+
+/* ── Other Routes ── */
+.other-routes-title{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:10px;letter-spacing:0.5px;}
+.routes-table{width:100%;}
+.routes-table-head{
+  display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 0.7fr 40px;
+  font-size:11px;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;
+  padding:6px 14px;border-bottom:1px solid var(--border);margin-bottom:4px;
+}
+.route-row-other{
+  display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 0.7fr 40px;
+  align-items:center;padding:12px 14px;border-radius:8px;
+  transition:background 0.15s;cursor:pointer;
+}
+.route-row-other:hover{background:rgba(255,255,255,0.03);}
+.route-name-cell{display:flex;align-items:center;gap:10px;}
+.route-mini-logo{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;}
+
+/* ── Why This Route ── */
+.why-route{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+  margin-top:16px;padding-top:16px;border-top:1px solid var(--border);
+}
+.why-item{display:flex;align-items:flex-start;gap:8px;}
+.why-icon{font-size:16px;margin-top:1px;}
+.why-text strong{font-size:12px;color:var(--text);display:block;margin-bottom:2px;}
+.why-text span{font-size:11px;color:var(--muted);}
+
+/* ── Trust Bar ── */
+.trust-bar{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  background:var(--panel2);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;margin-top:4px;
+}
+.trust-item{
+  display:flex;align-items:center;gap:10px;padding:14px 16px;
+  border-right:1px solid var(--border);
+}
+.trust-item:last-child{border-right:none;}
+.trust-icon{font-size:20px;color:var(--gold);}
+.trust-text strong{font-size:12px;color:var(--text);display:block;}
+.trust-text span{font-size:11px;color:var(--muted);}
+
+/* ═══════════════════════════════
+   RIGHT PANEL
+═══════════════════════════════ */
+.right-panel{display:flex;flex-direction:column;gap:16px;}
+
+/* ── AI Insight ── */
+.ai-insight{
+  background:var(--panel2);border:1px solid var(--border);border-radius:14px;padding:20px;
+  position:relative;overflow:hidden;
+}
+.ai-insight::after{
+  content:'';position:absolute;top:0;right:0;
+  width:80px;height:80px;
+  background:radial-gradient(circle,rgba(201,168,76,0.08),transparent 70%);
+}
+.ai-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.ai-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--text);}
+.ai-title .spark{color:var(--blue);font-size:16px;}
+.recommended-tag{
+  font-size:10px;font-weight:700;letter-spacing:1px;
+  background:rgba(201,168,76,0.15);color:var(--gold);
+  padding:3px 10px;border-radius:20px;
+}
+.ai-text{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
+.savings-highlight{
+  background:rgba(201,168,76,0.08);border:1px solid var(--gold-dim);
+  border-radius:8px;padding:12px 14px;margin-bottom:14px;
+}
+.savings-amount{font-size:18px;font-weight:700;color:var(--gold);margin-bottom:2px;}
+.savings-label{font-size:12px;color:var(--muted);}
+.ai-badges{display:flex;gap:8px;flex-wrap:wrap;}
+.ai-badge{
+  display:flex;align-items:center;gap:5px;
+  font-size:11px;color:var(--muted);
+  background:rgba(255,255,255,0.04);border:1px solid var(--border2);
+  border-radius:20px;padding:4px 10px;
+}
+.ai-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+
+/* ── Step Guide ── */
+.step-guide{
+  background:var(--panel2);border:1px solid var(--border);border-radius:14px;padding:20px;
+}
+.step-guide-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px;}
+.steps-list{display:flex;flex-direction:column;gap:12px;}
+.step-item{display:flex;align-items:flex-start;gap:12px;}
+.step-num{
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  background:rgba(201,168,76,0.12);border:1px solid var(--gold-dim);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--gold);
+}
+.step-content strong{font-size:13px;color:var(--text);display:block;margin-bottom:2px;}
+.step-content span{font-size:12px;color:var(--muted);}
+.connector-line{
+  width:1px;height:12px;background:var(--border2);
+  margin-left:13px;
+}
+.view-guide-btn{
+  width:100%;padding:11px;border-radius:8px;
+  background:transparent;border:1px solid var(--border2);
+  color:var(--muted);font-size:13px;margin-top:16px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:all 0.2s;
+}
+.view-guide-btn:hover{border-color:var(--gold-dim);color:var(--gold);}
+
+/* ═══════════════════════════════
+   HERO (public landing page)
+═══════════════════════════════ */
+.hero-section{
+  min-height:100vh;display:flex;align-items:center;
+  background:var(--bg);position:relative;overflow:hidden;
+  padding:80px 40px 60px;
+}
+.hero-glow{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:800px;height:800px;
+  background:radial-gradient(ellipse,rgba(201,168,76,0.04) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-inner{
+  max-width:1280px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
+  width:100%;
+}
+.phase-tag{
+  display:inline-block;
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold);border:1px solid var(--gold-dim);border-radius:4px;
+  padding:4px 12px;margin-bottom:20px;
+}
+.hero-title{font-size:clamp(36px,5vw,62px);font-weight:300;line-height:1.1;margin-bottom:20px;}
+.hero-title .gold{color:var(--gold);font-weight:700;}
+.hero-sub{font-size:16px;color:var(--muted);line-height:1.7;margin-bottom:28px;max-width:460px;}
+.hero-icons{display:flex;gap:24px;margin-bottom:28px;flex-wrap:wrap;}
+.hero-icon-item{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);}
+.hero-icon-circle{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(201,168,76,0.1);border:1px solid var(--gold-dim);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.hero-trust{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.country-flags{display:flex;gap:4px;}
+.country-flags span{font-size:20px;}
+.hero-badge{font-size:12px;color:var(--gold);font-weight:600;}
+.hero-right{position:relative;}
+/* Route finder widget lives inside hero-right in landing mode */
+
+/* ═══════════════════════════════
+   LANDING NAV
+═══════════════════════════════ */
+#landing-nav{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:64px;
+  transition:background 0.3s,border-color 0.3s;border-bottom:1px solid transparent;
+}
+#landing-nav.scrolled{background:rgba(7,7,8,0.96);border-color:var(--border);backdrop-filter:blur(12px);}
+.lnav-logo{display:flex;align-items:center;gap:10px;}
+.lnav-logo img{height:36px;width:36px;object-fit:contain;}
+.lnav-logo span{font-weight:700;font-size:18px;color:var(--text);}
+.lnav-links{display:flex;align-items:center;gap:28px;}
+.lnav-links a{font-size:13px;color:var(--muted);transition:color 0.2s;}
+.lnav-links a:hover{color:var(--text);}
+.lnav-actions{display:flex;align-items:center;gap:10px;}
+.btn-login{
+  padding:9px 20px;border:1px solid var(--border2);border-radius:6px;
+  background:none;color:var(--text);font-size:13px;font-weight:600;transition:all 0.2s;
+}
+.btn-login:hover{border-color:var(--gold-dim);color:var(--gold);}
+.btn-getstarted{
+  padding:9px 20px;border-radius:6px;
+  background:linear-gradient(135deg,var(--gold),#a07828);
+  color:#000;font-size:13px;font-weight:700;border:none;
+  transition:opacity 0.2s;
+}
+.btn-getstarted:hover{opacity:0.85;}
+
+/* ═══════════════════════════════
+   VIEWS (toggle landing vs app)
+═══════════════════════════════ */
+#landing-view{}
+#app-view{display:none;}
+
+/* ═══════════════════════════════
+   RESPONSIVE
+═══════════════════════════════ */
+@media(max-width:1024px){
+  .content-grid{grid-template-columns:1fr;}
+  .hero-inner{grid-template-columns:1fr;}
+}
+@media(max-width:768px){
+  #sidebar{display:none;}
+  #main{margin-left:0;padding:16px;}
+  .form-grid-2,.form-grid-3{grid-template-columns:1fr;}
+  .route-metrics{display:none;}
+  .trust-bar{grid-template-columns:1fr 1fr;}
+  .why-route{grid-template-columns:1fr;}
+  .lnav-links{display:none;}
+  .hero-section{padding:100px 20px 60px;}
+  .hero-inner{grid-template-columns:1fr;gap:40px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LANDING VIEW (public site)
+═══════════════════════════════════════════════════════════ -->
+<div id="landing-view">
+
+  <!-- Landing Nav -->
+  <nav id="landing-nav">
+    <div class="lnav-logo">
+      <img src="https://cozynetwork.fwh.is/wp-content/uploads/logo.png" onerror="this.style.display='none'" alt="Cozanet">
+      <span>Cozanet</span>
+    </div>
+    <div class="lnav-links">
+      <a href="#">Home</a>
+      <a href="#">How it works</a>
+      <a href="#">For you ▾</a>
+      <a href="#">Ecosystem</a>
+      <a href="#">Company ▾</a>
+    </div>
+    <div class="lnav-actions">
+      <button class="btn-login" onclick="showApp()">Log in</button>
+      <button class="btn-getstarted" onclick="showApp()">Get Started</button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-section" id="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-inner">
+      <!-- Left -->
+      <div class="hero-left">
+        <div class="phase-tag">Phase 1: Wallet Funding</div>
+        <h1 class="hero-title">
+          The Future of<br>
+          <span class="gold">African Remittance</span>
+        </h1>
+        <p class="hero-sub">Move your money the smart way. Cozanet finds the best route to fund any crypto wallet from your bank.</p>
+        <div class="hero-icons">
+          <div class="hero-icon-item">
+            <div class="hero-icon-circle">💰</div>
+            <div><strong>Cheaper</strong><br><small style="color:var(--muted);font-size:12px;">Save on fees</small></div>
+          </div>
+          <div class="hero-icon-item">
+            <div class="hero-icon-circle">⚡</div>
+            <div><strong>Faster</strong><br><small style="color:var(--muted);font-size:12px;">Get there in minutes</small></div>
+          </div>
+          <div class="hero-icon-item">
+            <div class="hero-icon-circle">🛡</div>
+            <div><strong>Safer</strong><br><small style="color:var(--muted);font-size:12px;">Routed with care</small></div>
+          </div>
+        </div>
+        <div class="hero-trust">
+          <span>Trusted by Africans across 20+ countries</span>
+          <div class="country-flags">
+            <span>🇳🇬</span><span>🇬🇭</span><span>🇰🇪</span><span>🇿🇦</span><span>🇨🇮</span><span>🇨🇲</span>
+          </div>
+          <span class="hero-badge">5,000+ Transactions completed</span>
+        </div>
+      </div>
+      <!-- Right: Route Finder Widget -->
+      <div class="hero-right">
+        <div class="widget-card" style="max-width:460px;">
+          <div class="widget-title">Find the best way to fund your wallet <span style="color:var(--muted);font-size:14px;">ⓘ</span></div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>You send</label>
+              <div class="input-wrap">
+                <input type="number" value="100,000" placeholder="Amount">
+                <div class="currency-select">
+                  <span class="flag">🇳🇬</span>
+                  <select><option>NGN</option><option>GHS</option><option>KES</option><option>ZAR</option></select>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Wallet address</label>
+              <div class="full-input" style="background:var(--bg);">
+                <input type="text" value="0x8f3...9Ab4" placeholder="Paste wallet address">
+                <button class="icon-btn">⊞</button>
+                <button class="icon-btn">⧉</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label>You want</label>
+              <div class="select-wrap">
+                <select><option>🔵 USDT</option><option>ETH</option><option>BNB</option><option>USDC</option></select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Network</label>
+              <div class="select-wrap">
+                <select><option>◆ BSC</option><option>Ethereum</option><option>Polygon</option><option>Arbitrum</option></select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Priority</label>
+              <div class="select-wrap">
+                <select><option>Cheapest</option><option>Fastest</option><option>Most Reliable</option></select>
+              </div>
+            </div>
+          </div>
+          <button class="find-btn" onclick="showApp()">Find Best Route →</button>
+          <div style="display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;">
+            <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px;">✓ Best price guarantee</span>
+            <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px;">✓ Real-time comparison</span>
+            <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px;">✓ No hidden fees</span>
+          </div>
+        </div>
+
+        <!-- Route Results Preview -->
+        <div style="max-width:460px;margin-top:16px;">
+          <div class="recommended-route">
+            <div class="rec-badge">Recommended</div>
+            <div class="route-row">
+              <div class="route-logo quidax">Q</div>
+              <div class="route-info">
+                <div class="route-name">Quidax</div>
+                <div class="route-type">Direct Purchase</div>
+                <div class="route-savings">You save ₦3,200</div>
+              </div>
+              <div class="route-metrics">
+                <div class="metric"><div class="metric-label">You pay (est.)</div><div class="metric-value">₦96,800</div></div>
+                <div class="metric"><div class="metric-label">Time</div><div class="metric-value">15 min</div><div class="metric-sub green">Fast</div></div>
+                <div class="metric"><div class="metric-label">Total Fees</div><div class="metric-value">₦3,200</div><div class="metric-sub">3.2%</div></div>
+                <div class="metric"><div class="metric-label">Risk</div><div class="metric-value">Low</div><span class="risk-dot risk-low"></span></div>
+              </div>
+              <span class="route-chevron">›</span>
+            </div>
+          </div>
+          <!-- AI Insight mini -->
+          <div class="ai-insight">
+            <div class="ai-header">
+              <div class="ai-title"><span class="spark">✦</span> AI Insight</div>
+              <div class="recommended-tag">Recommended</div>
+            </div>
+            <p class="ai-text">Quidax offers the best balance of speed, fees, and reliability for this transaction. You save ₦3,200 compared to the next best option.</p>
+            <div class="ai-badges">
+              <div class="ai-badge"><div class="dot"></div>Low Fees</div>
+              <div class="ai-badge"><div class="dot"></div>Fastest</div>
+              <div class="ai-badge"><div class="dot"></div>Reliable</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Bar -->
+  <div style="max-width:1280px;margin:0 auto;padding:0 40px 60px;">
+    <div class="trust-bar">
+      <div class="trust-item"><div class="trust-icon">🛡</div><div class="trust-text"><strong>Secure & Trusted</strong><span>Your safety is our priority</span></div></div>
+      <div class="trust-item"><div class="trust-icon">🔐</div><div class="trust-text"><strong>Bank-Level Security</strong><span>256-bit encryption</span></div></div>
+      <div class="trust-item"><div class="trust-icon">🔑</div><div class="trust-text"><strong>Non-Custodial</strong><span>You own your assets</span></div></div>
+      <div class="trust-item"><div class="trust-icon">💬</div><div class="trust-text"><strong>24/7 Support</strong><span>Here for you always</span></div></div>
+    </div>
+  </div>
+
+</div><!-- /landing-view -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     APP VIEW (after login)
+═══════════════════════════════════════════════════════════ -->
+<div id="app-view">
+
+  <!-- Top Bar -->
+  <header id="topbar">
+    <div class="topbar-logo">
+      <img src="https://cozynetwork.fwh.is/wp-content/uploads/logo.png" onerror="this.style.display='none'" alt="">
+      <div class="topbar-logo-text"><span>Cozanet</span><span>AEGIS</span></div>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-icon" title="Notifications">🔔</button>
+      <button class="topbar-icon" title="Toggle theme">🌙</button>
+      <div class="topbar-wallet">
+        <div class="wallet-dot"></div>
+        <span>0x8f3...9Ab4</span>
+        <span style="color:var(--muted);">▾</span>
+      </div>
+    </div>
+  </header>
+
+  <div id="layout">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-section">Menu</div>
+      <div class="sidebar-item active">
+        <span class="icon">🛡</span>
+        <span>Aegis</span>
+      </div>
+      <div style="padding:4px 16px 8px;font-size:11px;color:var(--muted2);">Wallet Funding</div>
+
+      <div class="sidebar-section" style="margin-top:8px;">Tools</div>
+      <div class="sidebar-item"><span class="icon">↔</span><span>Transactions</span></div>
+      <div class="sidebar-item"><span class="icon">👥</span><span>Beneficiaries</span></div>
+      <div class="sidebar-item"><span class="icon">🔗</span><span>Saved Routes</span></div>
+      <div class="sidebar-item">
+        <span class="icon">📊</span><span>Price Monitor</span>
+        <span class="sidebar-badge badge-new">New</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="icon">⭐</span><span>Rewards</span>
+        <span class="sidebar-badge badge-beta">Beta</span>
+      </div>
+
+      <div class="sidebar-section" style="margin-top:8px;">Account</div>
+      <div class="sidebar-item"><span class="icon">⚙</span><span>Settings</span></div>
+      <div class="sidebar-item" onclick="showLanding()"><span class="icon">🚪</span><span>Sign out</span></div>
+
+      <div class="sidebar-footer">
+        <div class="community-card">
+          <p>Join Cozanet Community<br>Get updates, guides and exclusive rewards.</p>
+          <button class="btn-join">Join Now</button>
+          <div class="avatar-stack" style="margin-top:10px;">
+            <div style="display:flex;justify-content:center;">
+              <span style="font-size:20px;">👥</span>
+            </div>
+          </div>
+        </div>
+        <div class="sidebar-secure" style="margin-top:12px;">
+          <span class="shield">🛡</span>
+          <span><strong>Secured by Cozanet</strong>Bank-level security</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title-block">
+          <h1><span class="shield-icon">🛡</span> Aegis</h1>
+          <p>Your shield for smart, secure wallet funding.</p>
+        </div>
+        <button class="how-btn">
+          <div class="play">▶</div>
+          How Aegis Works
+        </button>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="content-grid">
+        <!-- Left Column -->
+        <div>
+          <!-- Find Route Widget -->
+          <div class="widget-card">
+            <div class="widget-title">Find the best way to fund your wallet</div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label>You send</label>
+                <div class="input-wrap">
+                  <input type="number" value="100000" placeholder="Amount">
+                  <div class="currency-select">
+                    <span class="flag">🇳🇬</span>
+                    <select><option>NGN</option><option>GHS</option><option>KES</option><option>ZAR</option></select>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>You want</label>
+                <div class="select-wrap">
+                  <select><option>🔵 USDT</option><option>ETH</option><option>BNB</option><option>USDC</option></select>
+                </div>
+              </div>
+            </div>
+            <div class="form-grid-3">
+              <div class="form-group" style="grid-column:1/3;">
+                <label>Wallet address</label>
+                <div class="full-input">
+                  <input type="text" value="0x8f3c...9Ab4eF2d7B8c6A3fEd6B89c2a4F5e6d7C8b9A0" placeholder="Paste your wallet address">
+                  <button class="icon-btn">⊞</button>
+                  <button class="icon-btn">⧉</button>
+                  <span class="valid-tag">✓ Valid address</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Network</label>
+                <div class="select-wrap">
+                  <select><option>◆ BSC</option><option>Ethereum</option><option>Polygon</option><option>Arbitrum</option></select>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Priority</label>
+              <div class="select-wrap">
+                <select><option>Cheapest</option><option>Fastest</option><option>Most Reliable</option></select>
+              </div>
+            </div>
+            <button class="find-btn" onclick="findRoute()">Find Best Route ✦</button>
+          </div>
+
+          <!-- Route Results -->
+          <div class="routes-section">
+            <div class="routes-header">Best Route For You</div>
+
+            <!-- Recommended -->
+            <div class="recommended-route">
+              <div class="rec-badge">Recommended</div>
+              <div class="route-row">
+                <div class="route-logo quidax" style="font-size:14px;">Q</div>
+                <div class="route-info">
+                  <div class="route-name">Quidax</div>
+                  <div class="route-type">Direct Purchase</div>
+                  <div class="route-savings">You save ₦3,200</div>
+                </div>
+                <div class="route-metrics">
+                  <div class="metric"><div class="metric-label">You pay (est.)</div><div class="metric-value">₦96,800</div></div>
+                  <div class="metric"><div class="metric-label">Time</div><div class="metric-value">15 min</div><div class="metric-sub green">Fast</div></div>
+                  <div class="metric"><div class="metric-label">Total Fees</div><div class="metric-value">₦3,200</div><div class="metric-sub">3.2%</div></div>
+                  <div class="metric"><div class="metric-label">Risk</div><div class="metric-value" style="display:flex;align-items:center;gap:4px;">Low <span class="risk-dot risk-low"></span></div></div>
+                </div>
+                <span class="route-chevron">›</span>
+              </div>
+            </div>
+
+            <!-- Other Options -->
+            <div class="other-routes-title">Other Options</div>
+            <div class="routes-table-head">
+              <span>Route</span><span>You pay (est.)</span><span>Time</span><span>Total Fees</span><span>Risk</span><span></span>
+            </div>
+            <div class="route-row-other">
+              <div class="route-name-cell">
+                <div class="route-mini-logo binance" style="background:linear-gradient(135deg,#1a1400,#2a2000);color:#f0b90b;">◆</div>
+                <span>Binance P2P</span>
+              </div>
+              <span>₦95,500</span>
+              <span>25 min</span>
+              <span>₦4,500 (4.5%)</span>
+              <span style="display:flex;align-items:center;gap:5px;"><span class="risk-dot risk-medium"></span> Medium</span>
+              <span style="color:var(--muted);">›</span>
+            </div>
+            <div class="route-row-other">
+              <div class="route-name-cell">
+                <div class="route-mini-logo" style="background:linear-gradient(135deg,#1a1200,#2a1e00);color:#f59e0b;">Y</div>
+                <span>Yellow Card</span>
+              </div>
+              <span>₦97,900</span>
+              <span>20 min</span>
+              <span>₦2,100 (2.1%)</span>
+              <span style="display:flex;align-items:center;gap:5px;"><span class="risk-dot risk-low"></span> Low</span>
+              <span style="color:var(--muted);">›</span>
+            </div>
+            <div class="route-row-other">
+              <div class="route-name-cell">
+                <div class="route-mini-logo" style="background:linear-gradient(135deg,#0a1a2a,#071525);color:#6366f1;">Px</div>
+                <span>Paxful P2P</span>
+              </div>
+              <span>₦94,800</span>
+              <span>30 min</span>
+              <span>₦5,200 (5.5%)</span>
+              <span style="display:flex;align-items:center;gap:5px;"><span class="risk-dot risk-high"></span> High</span>
+              <span style="color:var(--muted);">›</span>
+            </div>
+
+            <!-- Why This Route -->
+            <div class="why-route">
+              <div class="why-item">
+                <div class="why-icon" style="color:var(--green);">✓</div>
+                <div class="why-text"><strong>Lower total cost</strong><span>Saves you more</span></div>
+              </div>
+              <div class="why-item">
+                <div class="why-icon" style="color:var(--gold);">⚡</div>
+                <div class="why-text"><strong>Faster settlement</strong><span>Money in 15 minutes</span></div>
+              </div>
+              <div class="why-item">
+                <div class="why-icon" style="color:var(--blue);">🛡</div>
+                <div class="why-text"><strong>High reliability</strong><span>99.9% success rate</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trust Bar -->
+          <div class="trust-bar" style="margin-top:20px;">
+            <div class="trust-item"><div class="trust-icon">🛡</div><div class="trust-text"><strong>Best Price Guarantee</strong><span>We compare 20+ providers</span></div></div>
+            <div class="trust-item"><div class="trust-icon">🔍</div><div class="trust-text"><strong>No Hidden Fees</strong><span>100% transparent pricing</span></div></div>
+            <div class="trust-item"><div class="trust-icon">📡</div><div class="trust-text"><strong>Real-time Data</strong><span>Live rates & availability</span></div></div>
+            <div class="trust-item"><div class="trust-icon">🔐</div><div class="trust-text"><strong>Secure & Trusted</strong><span>Your safety is our priority</span></div></div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="right-panel">
+          <!-- AI Insight -->
+          <div class="ai-insight">
+            <div class="ai-header">
+              <div class="ai-title"><span class="spark">✦</span> Aegis AI Insight</div>
+              <div class="recommended-tag">Recommended</div>
+            </div>
+            <p class="ai-text">Quidax offers the best balance of low fees, fast settlement, and high reliability for your transaction.</p>
+            <div class="savings-highlight">
+              <div class="savings-amount">You save ₦3,200</div>
+              <div class="savings-label">compared to the next best option</div>
+            </div>
+            <div class="ai-badges">
+              <div class="ai-badge"><div class="dot"></div>Low Fees</div>
+              <div class="ai-badge"><div class="dot"></div>Fastest</div>
+              <div class="ai-badge"><div class="dot"></div>Reliable</div>
+            </div>
+          </div>
+
+          <!-- Step Guide -->
+          <div class="step-guide">
+            <div class="step-guide-title">Step-by-step Guide</div>
+            <div class="steps-list">
+              <div class="step-item">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                  <strong>Deposit ₦100,000</strong>
+                  <span>Transfer to Quidax using your bank.</span>
+                </div>
+              </div>
+              <div class="connector-line"></div>
+              <div class="step-item">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                  <strong>Buy USDT</strong>
+                  <span>Purchase USDT with your NGN balance.</span>
+                </div>
+              </div>
+              <div class="connector-line"></div>
+              <div class="step-item">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                  <strong>Withdraw to Wallet</strong>
+                  <span>Paste your wallet address and select BSC.</span>
+                </div>
+              </div>
+              <div class="connector-line"></div>
+              <div class="step-item">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                  <strong>Confirm Network</strong>
+                  <span>Ensure you select BSC network.</span>
+                </div>
+              </div>
+              <div class="connector-line"></div>
+              <div class="step-item">
+                <div class="step-num">5</div>
+                <div class="step-content">
+                  <strong>Receive USDT</strong>
+                  <span>USDT will be sent to your wallet.</span>
+                </div>
+              </div>
+            </div>
+            <button class="view-guide-btn">View Detailed Guide ↗</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div><!-- /app-view -->
+
+<script>
+// Nav scroll effect
+window.addEventListener('scroll', function() {
+  var nav = document.getElementById('landing-nav');
+  if(nav) {
+    if(window.scrollY > 20) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  }
+});
+
+// View switching
+function showApp() {
+  document.getElementById('landing-view').style.display = 'none';
+  document.getElementById('app-view').style.display = 'block';
+}
+function showLanding() {
+  document.getElementById('app-view').style.display = 'none';
+  document.getElementById('landing-view').style.display = 'block';
+}
+
+// Find route (simulate)
+function findRoute() {
+  var btn = document.querySelector('#app-view .find-btn');
+  var orig = btn.innerHTML;
+  btn.innerHTML = '⌛ Finding best route...';
+  btn.style.opacity = '0.7';
+  setTimeout(function() {
+    btn.innerHTML = '✓ Routes Updated!';
+    btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+    setTimeout(function() {
+      btn.innerHTML = orig;
+      btn.style.background = '';
+      btn.style.opacity = '';
+    }, 2000);
+  }, 1500);
+}
+
+// Sidebar items
+document.querySelectorAll('.sidebar-item').forEach(function(item) {
+  item.addEventListener('click', function() {
+    if(this.querySelector('span:last-child') && this.querySelector('span:last-child').textContent === 'Sign out') return;
+    document.querySelectorAll('.sidebar-item').forEach(function(i){ i.classList.remove('active'); });
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
