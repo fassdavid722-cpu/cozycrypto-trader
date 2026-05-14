@@ -1,14 +1,15 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-// Default workflows — the AI's autonomous learning/trading loops
-const DEFAULT_WORKFLOWS = [
-  { id: 'market-scanner', name: 'Market Scanner', description: 'Scanning top 50 coins', status: 'running' },
-  { id: 'signal-bot', name: 'Trading Signal Bot', description: 'Monitoring 12 pairs', status: 'running' },
-  { id: 'sentiment', name: 'News & Sentiment', description: 'Analyzing global sentiment', status: 'running' },
-  { id: 'rebalancer', name: 'Portfolio Rebalancer', description: 'Next run in 2h 15m', status: 'scheduled' },
-]
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  return res.status(200).json({ workflows: DEFAULT_WORKFLOWS })
+  if (req.method === 'OPTIONS') return res.status(200).end()
+  return res.status(200).json({
+    workflows: [
+      { id:'learner',        name:'Intelligence Learner',    description:'Market intel updates every 20 min',    status:'running', type:'ai' },
+      { id:'market-scanner', name:'Elite Multi-TF Scanner',  description:'6-timeframe confluence scoring',        status:'running', type:'analysis' },
+      { id:'signal-bot',     name:'SMC Signal Monitor',      description:'Order blocks, FVGs, liquidity sweeps',  status:'running', type:'trading' },
+      { id:'risk-guard',     name:'Risk Guard',              description:'Position sizing + SL/TP enforcement',   status:'running', type:'risk' },
+      { id:'anomaly-detect', name:'Anomaly Detector',        description:'Volume spikes, price gaps, whale moves',status:'running', type:'alert' },
+      { id:'reasoning-eng',  name:'Elite Reasoning Engine',  description:'Step-by-step chain-of-thought analysis',status:'running', type:'ai' },
+    ]
+  })
 }

@@ -1,83 +1,43 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import crypto from 'crypto'
 
-const BITGET_KEY = process.env.BITGET_API_KEY || ''
-const BITGET_SECRET = process.env.BITGET_SECRET_KEY || ''
-const BITGET_PASSPHRASE = process.env.BITGET_PASSPHRASE || ''
-const BASE_URL = 'https://api.bitget.com'
+const BASE = 'https://api.bitget.com'
+const KEY  = process.env.BITGET_API_KEY    || ''
+const SEC  = process.env.BITGET_SECRET_KEY || ''
+const PASS = process.env.BITGET_PASSPHRASE || ''
 
-function sign(timestamp: string, method: string, path: string, body = ''): string {
-  const message = timestamp + method.toUpperCase() + path + body
-  return crypto.createHmac('sha256', BITGET_SECRET).update(message).digest('base64')
+function sign(ts: string, method: string, path: string, body = '') {
+  return crypto.createHmac('sha256', SEC).update(ts + method + path + body).digest('base64')
 }
 
-async function bitgetRequest(path: string) {
-  const timestamp = Date.now().toString()
-  const signature = sign(timestamp, 'GET', path)
-
-  const res = await fetch(`${BASE_URL}${path}`, {
-    headers: {
-      'ACCESS-KEY': BITGET_KEY,
-      'ACCESS-SIGN': signature,
-      'ACCESS-TIMESTAMP': timestamp,
-      'ACCESS-PASSPHRASE': BITGET_PASSPHRASE,
-      'Content-Type': 'application/json',
-      'locale': 'en-US'
-    }
-  })
-  return res.json()
+function headers(method: string, path: string, body = '') {
+  const ts = Date.now().toString()
+  return { 'ACCESS-KEY': KEY, 'ACCESS-SIGN': sign(ts, method, path, body),
+           'ACCESS-TIMESTAMP': ts, 'ACCESS-PASSPHRASE': PASS, 'Content-Type': 'application/json', 'locale':'en-US' }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-
-  if (!BITGET_KEY) {
-    // No keys configured — return empty portfolio
-    return res.status(200).json({
-      value: 0, change: 0, balance: 0,
-      history: [],
-      message: 'API keys not configured. AI is in learning mode.'
-    })
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end()
+  if (!KEY) return res.status(200).json({ value:0, balance:0, change:0, history:[], assets:[], mode:'no_keys', message:'Add Bitget API keys to Vercel environment variables' })
 
   try {
-    // Get spot account assets
-    const accountData = await bitgetRequest('/api/v2/spot/account/assets')
-
-    let totalUSD = 0
-    const assets = accountData?.data || []
-
-    // Sum all assets in USDT equivalent
-    for (const asset of assets) {
-      const available = parseFloat(asset.available || 0)
-      const frozen = parseFloat(asset.frozen || 0)
-      const usdtVal = parseFloat(asset.usdtValue || 0)
-      totalUSD += usdtVal || (asset.coinName === 'USDT' ? available + frozen : 0)
-    }
-
-    // Get available USDT
-    const usdtAsset = assets.find((a: any) => a.coinName === 'USDT')
-    const balance = parseFloat(usdtAsset?.available || 0)
-
-    // Generate simple history from current value
-    const now = new Date()
-    const history = Array.from({ length: 24 }, (_, i) => ({
-      time: `${(now.getHours() - 23 + i + 24) % 24}:00`,
-      value: parseFloat((totalUSD * (0.95 + Math.random() * 0.1)).toFixed(2))
-    }))
-    history[history.length - 1].value = parseFloat(totalUSD.toFixed(2))
-
+    const path = '/api/v2/spot/account/assets'
+    const r = await fetch(BASE + path, { headers: headers('GET', path) as any, signal: AbortSignal.timeout(10000) })
+    if (!r.ok) return res.status(200).json({ value:0, balance:0, change:0, history:[], assets:[], mode:'api_error' })
+    const d = await r.json() as any
+    const assets = (d.data || []).filter((a: any) => parseFloat(a.available||'0') > 0 || parseFloat(a.usdtValue||'0') > 0.001)
+    const total   = assets.reduce((s: number, a: any) => s + parseFloat(a.usdtValue||'0'), 0)
+    const usdt    = assets.find((a: any) => a.coinName === 'USDT')?.available || '0'
     return res.status(200).json({
-      value: parseFloat(totalUSD.toFixed(2)),
-      change: parseFloat(((Math.random() * 6) - 2).toFixed(2)), // Will be real once we track history
-      balance: parseFloat(balance.toFixed(2)),
-      history
+      value:   Math.round(total * 10000) / 10000,
+      balance: parseFloat(usdt),
+      change:  0,
+      history: [],
+      assets:  assets.map((a: any) => ({ coin: a.coinName, available: parseFloat(a.available), usd_value: parseFloat(a.usdtValue||'0') })),
+      micro_mode: total < 10,
+      mode: 'live'
     })
-  } catch (error: any) {
-    console.error('Portfolio error:', error)
-    return res.status(200).json({
-      value: 0, change: 0, balance: 0, history: [],
-      error: error.message
-    })
+  } catch (err: any) {
+    return res.status(200).json({ value:0, balance:0, change:0, history:[], assets:[], mode:'error', message: err.message })
   }
 }
