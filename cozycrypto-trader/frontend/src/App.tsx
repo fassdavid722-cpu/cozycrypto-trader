@@ -9,78 +9,89 @@ import AIChat from '@/components/pages/AIChat'
 import Workflows from '@/components/pages/Workflows'
 import Settings from '@/components/pages/Settings'
 import { useStore } from '@/store/useStore'
+import { useSSE } from '@/hooks/useSSE'
+
+const API = import.meta.env.VITE_API_URL || ''
 
 function PageContent() {
   const { activeTab } = useStore()
   switch (activeTab) {
-    case 'dashboard': return <Dashboard />
-    case 'ai-chat': return <AIChat />
-    case 'market': return <MarketOverview />
-    case 'portfolio': return <Portfolio />
-    case 'workflows': return <Workflows />
-    case 'settings': return <Settings />
-    default: return <Dashboard />
+    case 'dashboard':   return <Dashboard />
+    case 'ai-chat':     return <AIChat />
+    case 'market':      return <MarketOverview />
+    case 'portfolio':   return <Portfolio />
+    case 'workflows':   return <Workflows />
+    case 'settings':    return <Settings />
+    default:            return <Dashboard />
   }
 }
 
 export default function App() {
-  const { setTickers, setPortfolio, setWorkflows, addAlert, setAiStatus } = useStore()
+  const { setTickers, setPortfolio, setWorkflows, setAiStatus } = useStore()
+
+  // Connect SSE for real-time notifications
+  useSSE()
 
   useEffect(() => {
-    // Initial data fetch
     fetchMarketData()
     fetchPortfolio()
     fetchWorkflows()
+    fetchSettings()
 
-    // Poll market data every 10 seconds
-    const marketInterval = setInterval(fetchMarketData, 10000)
+    const marketInterval = setInterval(fetchMarketData, 15000)
     const portfolioInterval = setInterval(fetchPortfolio, 30000)
-
-    return () => {
-      clearInterval(marketInterval)
-      clearInterval(portfolioInterval)
-    }
+    return () => { clearInterval(marketInterval); clearInterval(portfolioInterval) }
   }, [])
 
   const fetchMarketData = async () => {
     try {
-      const res = await fetch('/api/market/tickers')
+      const res = await fetch(`${API}/api/market/tickers`)
       if (res.ok) {
         const data = await res.json()
-        setTickers(data.tickers || [])
+        // Map snake_case from Python backend
+        const tickers = (data.tickers || []).map((t: any) => ({
+          symbol:    t.symbol,
+          price:     t.price,
+          change24h: t.change_24h,
+          volume:    t.volume,
+          high24h:   t.high_24h,
+          low24h:    t.low_24h,
+          sparkline: t.sparkline || [],
+        }))
+        setTickers(tickers)
       }
-    } catch {
-      // Silently fail — will retry
-    }
+    } catch {}
   }
 
   const fetchPortfolio = async () => {
     try {
-      const res = await fetch('/api/portfolio')
+      const res = await fetch(`${API}/api/portfolio`)
       if (res.ok) {
         const data = await res.json()
         setPortfolio(data.value || 0, data.change || 0, data.history || [], data.balance || 0)
       }
-    } catch {
-      // Silently fail
-    }
+    } catch {}
   }
 
   const fetchWorkflows = async () => {
     try {
-      const res = await fetch('/api/workflows')
+      const res = await fetch(`${API}/api/workflows`)
       if (res.ok) {
         const data = await res.json()
         setWorkflows(data.workflows || [])
       }
-    } catch {
-      setWorkflows([
-        { id: '1', name: 'Market Scanner', description: 'Scanning top 50 coins', status: 'running' },
-        { id: '2', name: 'Trading Signal Bot', description: 'Monitoring 12 pairs', status: 'running' },
-        { id: '3', name: 'News & Sentiment', description: 'Analyzing global sentiment', status: 'running' },
-        { id: '4', name: 'Portfolio Rebalancer', description: 'Next run in 2h 15m', status: 'scheduled' },
-      ])
-    }
+    } catch {}
+  }
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch(`${API}/api/settings`)
+      if (res.ok) {
+        const data = await res.json()
+        const allConnected = data.connected?.bitget && data.connected?.groq
+        setAiStatus(allConnected ? 'online' : 'learning')
+      }
+    } catch {}
   }
 
   return (
